@@ -1,6 +1,6 @@
 // Original pentatonic lullaby. No audio files, requests, microphones or third-party samples.
 export class IslandMusic {
- constructor({Context=globalThis.AudioContext||globalThis.webkitAudioContext,setTimer=globalThis.setInterval,clearTimer=globalThis.clearInterval,onStatus=()=>{}}={}) {
+ constructor({Context=globalThis.AudioContext||globalThis.webkitAudioContext,setTimer=globalThis.setInterval.bind(globalThis),clearTimer=globalThis.clearInterval.bind(globalThis),onStatus=()=>{}}={}) {
   Object.assign(this,{Context,setTimer,clearTimer,onStatus});
   this.context=null;this.gain=null;this.timer=null;this.notes=new Set();
   this.enabled=true;this.running=false;this.unlocked=false;this.ducked=false;

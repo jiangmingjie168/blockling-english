@@ -31,6 +31,6 @@ The game has no accounts, chat, ads, analytics, purchases, or collection of chil
 
 Original Canvas-drawn characters and scenery, a bounded 2.5D isometric world, a bridge, a friendly bunny and a small customizable garden. This is not a true 3D engine. There are no third-party runtime libraries, asset services or paid APIs. No educational outcome is promised.
 
-V2 has 38 passing source-level tests covering game progression, inventory, migration, storage safeguards and simulated UI/audio events. These are not real-browser or listening tests. V2 visual acceptance, physical mobile behavior and audible music/voice quality remain unverified at publication preparation.
+V2 has 40 passing source-level tests covering game progression, inventory, migration, storage safeguards and simulated UI/audio events. These are not real-browser or listening tests. V2 visual acceptance, physical mobile behavior and audible music/voice quality remain unverified at publication preparation.
 
 For local development, serve these files with a static HTTP server. Opening index.html directly as a local file is not supported because the game uses JavaScript modules.

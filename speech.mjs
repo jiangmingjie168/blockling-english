@@ -1,6 +1,6 @@
 // Browser speech lifecycle is separate from game progress; failure always releases ducking.
 export class SpeechGuide {
- constructor({synth,Utterance,music,onStatus=()=>{},setTimer=globalThis.setTimeout,clearTimer=globalThis.clearTimeout}) {
+ constructor({synth,Utterance,music,onStatus=()=>{},setTimer=globalThis.setTimeout.bind(globalThis),clearTimer=globalThis.clearTimeout.bind(globalThis)}) {
   Object.assign(this,{synth,Utterance,music,onStatus,setTimer,clearTimer});
   this.current=null;this.timer=null;
  }
