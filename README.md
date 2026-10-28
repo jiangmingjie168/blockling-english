@@ -1,29 +1,36 @@
-# Blockling English · Sunny Shores
+# Blockling English · Bunny Garden
 
-A small original block-building adventure for beginner English explorers, best played together with a grown-up.
+An original, small island adventure for children beginning English, best explored together with a grown-up.
 
 ## Play
 
-Open the repository's GitHub Pages website in a modern browser on a computer, phone or tablet. No account or app installation is needed. Tap **Let's explore** to start.
+Open this repository's GitHub Pages website in a modern browser. No account or installation is needed. Tap **Let's explore**.
 
-1. **Find the apple.** Listen or read, then tap the apple.
-2. **Find three blue blocks.** Collect them and place the three bridge pieces in order.
-3. **Walk. Jump. Plant.** Cross the bridge, jump on the star and plant a seed.
+1. Find an apple and collect three blue blocks.
+2. Repair the bridge to reach a new island and meet bunny.
+3. Jump on the star and plant a flower.
+4. Collect two wood bundles and two seed bags. Choose benches, lanterns, flowers or carrots for four garden plots; choose a roof color. After decorating at least two plots, choose **Picnic & rest** for a clear stopping point.
 
-Tap grass to walk, or use arrow keys / WASD. Tap objects to collect. Choose Build to place the red, yellow or green blocks on sandy tiles; Pick up returns them. Jump is also available with Space when the game canvas has keyboard focus. On small screens, direction buttons are available.
+Tap grass to walk and objects to interact. Arrow keys / WASD also move; Space jumps when the game canvas has focus. On small screens, direction buttons are available. **Build** uses the six sandy tiles on the first island. **Pick up** returns placed blocks and garden materials for rearranging. **Map** shows both islands. Chinese hints and a parent guide are available.
 
-Optional Chinese hints and a parent guide are included. After the three short adventures, the island invites you to take a break. Progress reset requires confirmation in Parents.
+## Music and speech
 
-## Progress, speech and privacy
+The original, low-volume procedural melody starts only after a user gesture. **Music** turns it on/off and saves that choice. Instruction speech lowers the melody; pause, dialogs and page hiding stop the music. Audio availability and quality vary by browser and device. The game remains playable without audio.
 
-Progress is saved only in this browser's localStorage. Devices, browsers and website origins have separate saves; a save from a local prototype is not uploaded or transferred to this website. Blocking browser storage or clearing browser data can prevent or remove saves.
+**Listen** uses only English voices the browser identifies as local. Voice detection does not verify pronunciation or audible output. Text remains available if speech cannot play. No microphone is requested.
 
-English speech is optional and starts only when Listen is tapped. Only voices the browser identifies as local English voices are selected. Availability and sound quality vary by device. A text fallback is shown if speech is unavailable. No microphone is requested.
+## Saves and privacy
 
-The game has no accounts, ads, chat, analytics, payment service, or collection of child names or photos. GitHub Pages, as the hosting provider, may retain ordinary access/security logs, including visitors' IP addresses. See GitHub's privacy documentation for hosting details.
+Progress and the music choice stay in this browser's localStorage. Different devices, browsers and website origins have separate saves. Local-development saves are not uploaded or transferred to this website.
 
-## Prototype scope
+A valid V1 save on the same origin is copied into a separate V2 record, leaving the original V1 record unchanged. Existing V2 progress takes precedence. Unreadable saves are protected from automatic replacement. Reset requires explicit confirmation in **Parents** and resets V2 only, retaining V1 and the music choice. Clearing browser data can remove saves; unavailable storage prevents saving.
 
-Original code-drawn art, a fixed 2.5D island, three tasks and six sandbox building tiles. No third-party game assets, libraries, fonts or runtime services. This prototype makes no educational-outcome claim. Desktop and phone-sized browser viewports have been tested; physical phone/tablet hardware and audible pronunciation have not been independently verified.
+The game has no accounts, chat, ads, analytics, purchases, or collection of children's names/photos. The hosting provider may keep ordinary access/security logs, including IP addresses.
 
-For local development, serve this folder with any static HTTP server. A server is needed for JavaScript modules; opening index.html directly as a local file is not supported.
+## Scope and verification
+
+Original Canvas-drawn characters and scenery, a bounded 2.5D isometric world, a bridge, a friendly bunny and a small customizable garden. This is not a true 3D engine. There are no third-party runtime libraries, asset services or paid APIs. No educational outcome is promised.
+
+V2 has 38 passing source-level tests covering game progression, inventory, migration, storage safeguards and simulated UI/audio events. These are not real-browser or listening tests. V2 visual acceptance, physical mobile behavior and audible music/voice quality remain unverified at publication preparation.
+
+For local development, serve these files with a static HTTP server. Opening index.html directly as a local file is not supported because the game uses JavaScript modules.

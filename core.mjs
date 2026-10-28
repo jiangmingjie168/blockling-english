@@ -1,104 +1,35 @@
-export const SAVE_KEY = 'blockling-english-v1';
-export const resources = [
-  {id:'apple', x:2,y:3,type:'apple',word:'apple'},
-  {id:'flower', x:1,y:5,type:'flower',word:'flower'},
-  {id:'blue1', x:4,y:2,type:'blue',word:'blue block'},
-  {id:'blue2', x:2,y:6,type:'blue',word:'blue block'},
-  {id:'blue3', x:5,y:6,type:'blue',word:'blue block'}
-];
-export const bridgeCells = [{x:7,y:4},{x:8,y:4},{x:9,y:4}];
-export const star = {x:11,y:4};
-export const garden = {x:11,y:5};
-export const buildCells = [{x:0,y:3},{x:0,y:4},{x:0,y:5},{x:1,y:6},{x:1,y:7},{x:2,y:7}];
-export const trees = [{x:1,y:1},{x:4,y:1},{x:6,y:2},{x:0,y:2},{x:12,y:3}];
-export const same = (a,b) => a.x===b.x && a.y===b.y;
-export const distance = (a,b) => Math.abs(a.x-b.x)+Math.abs(a.y-b.y);
-export function isLand(x,y) {
-  return (x>=0&&x<=6&&y>=1&&y<=7 && !(x===0&&(y===1||y===7)) && !(x===6&&(y===1||y===7))) || (x>=10&&x<=12&&y>=3&&y<=6 && !(x===12&&y===6));
-}
-export function freshState() { return {version:1,started:false,player:{x:3,y:4},picked:[],bridge:[],built:[],arrived:false,jumped:false,planted:false,zh:false}; }
-export function quest(s) { return !s.picked.includes('apple') ? 0 : s.bridge.length<3 ? 1 : !s.planted ? 2 : 3; }
-export function blueCount(s) { return s.picked.filter(id=>id.startsWith('blue')).length-s.bridge.length; }
-export function walkable(s,p) {
-  return (isLand(p.x,p.y)||bridgeCells.some((c,i)=>same(c,p)&&s.bridge.includes(i))) && !trees.some(t=>same(t,p)) && !s.built.some(b=>same(b,p));
-}
-export function pathTo(s,target) {
-  if (!walkable(s,target)) return null;
-  const queue=[[s.player,[]]], seen=new Set([`${s.player.x},${s.player.y}`]);
-  for(let i=0;i<queue.length;i++) {
-    const [p,path]=queue[i];
-    if(same(p,target)) return path;
-    for(const [dx,dy] of [[1,0],[0,1],[-1,0],[0,-1]]) {
-      const n={x:p.x+dx,y:p.y+dy}, key=`${n.x},${n.y}`;
-      if(!seen.has(key)&&walkable(s,n)) {seen.add(key);queue.push([n,[...path,n]]);}
-    }
-  }
-  return null;
-}
-function ok(message) {return {ok:true,message};}
-function no(message) {return {ok:false,message};}
-export function move(s,p) {
-  if(!s.started||s.planted) return no('Our adventure is resting.');
-  if(distance(s.player,p)!==1||!walkable(s,p)) return no('Stay on the grass. Tap a clear tile.');
-  s.player={...p};
-  if(quest(s)===2&&same(p,star)) s.arrived=true;
-  return ok('');
-}
-export function collect(s,id) {
-  const item=resources.find(r=>r.id===id);
-  if(!s.started||s.planted) return no('Start your adventure first.');
-  if(!item||distance(s.player,item)>0) return no('Walk closer.');
-  if(item.type==='flower') return no('This is a flower. Find the apple!');
-  if(s.picked.includes(id)) return no('Already in your bag.');
-  if(item.type==='blue'&&quest(s)===0) return no('A blue block! First, find the apple.');
-  s.picked.push(id);
-  return ok(item.type==='apple' ? 'Apple! A little snack for our adventure.' : `${['','One','Two','Three'][s.picked.filter(i=>i.startsWith('blue')).length]} blue block${s.picked.filter(i=>i.startsWith('blue')).length>1?'s':''}!`);
-}
-export function placeBridge(s,index) {
-  if(!s.started||quest(s)!==1) return no('First, find the apple.');
-  if(s.bridge.includes(index)) return no('This part of the bridge is ready.');
-  if(index!==s.bridge.length) return no('Build from the grass, one block at a time.');
-  if(blueCount(s)<1) return no('Find a blue block first.');
-  if(distance(s.player,bridgeCells[index])!==1) return no('Walk to the edge of the bridge.');
-  s.bridge.push(index);
-  return ok(s.bridge.length===3?'Three blue blocks. A bridge!':'Blue block placed!');
-}
-export function jump(s) {
-  if(!s.started||s.planted) return no('Our adventure is resting.');
-  if(quest(s)===2 && same(s.player,star)) {s.arrived=true;s.jumped=true;return ok('Jump! Now plant a seed.');}
-  return ok('Jump!');
-}
-export function plant(s) {
-  if(s.planted) return no('Your flower is already growing.');
-  if(quest(s)!==2||!s.jumped) return no('Walk to the star. Then jump!');
-  if(!same(s.player,garden)) return no('Walk to the little garden.');
-  s.planted=true;return ok('A flower for the island. Thank you!');
-}
-export function build(s,p,color) {
-  if(!s.started||s.planted) return no('Our adventure is resting.');
-  if(!['coral','gold','mint'].includes(color)||!buildCells.some(c=>same(c,p))) return no('Build on the six sandy tiles.');
-  if(distance(s.player,p)>1) return no('Walk beside a sandy tile first.');
-  if(same(s.player,p)) return no('Step off this tile before building.');
-  if(s.built.some(b=>same(b,p))) return no('There is already a block here. Use Pick up.');
-  if(s.built.filter(b=>b.color===color).length>=2) return no('Both blocks are placed. Pick one up to move it.');
-  s.built.push({...p,color});return ok(`${color==='coral'?'Red':color==='gold'?'Yellow':'Green'} block placed!`);
-}
-export function remove(s,p) {
-  if(!s.started||s.planted) return no('Our adventure is resting.');
-  const index=s.built.findIndex(b=>same(b,p));
-  if(index<0) return no('Pick up a block from the sandy tiles.');
-  if(distance(s.player,p)>1) return no('Walk beside the block first.');
-  s.built.splice(index,1);return ok('Block back in your bag.');
-}
-export function restore(raw) {
-  const s=JSON.parse(raw);
-  if(!s||s.version!==1||typeof s.started!=='boolean'||!s.player||!Number.isInteger(s.player.x)||!Number.isInteger(s.player.y)||!Array.isArray(s.picked)||!Array.isArray(s.bridge)||!Array.isArray(s.built)) throw Error('Invalid save');
-  if(!['arrived','jumped','planted','zh'].every(k=>typeof s[k]==='boolean')) throw Error('Invalid flags');
-  if(s.picked.some(i=>!['apple','blue1','blue2','blue3'].includes(i))||new Set(s.picked).size!==s.picked.length) throw Error('Invalid collection');
-  if(s.bridge.length>3||s.bridge.some((v,i)=>v!==i)||blueCount(s)<0) throw Error('Invalid bridge');
-  if((s.picked.some(i=>i.startsWith('blue'))&&!s.picked.includes('apple')) || (s.arrived&&s.bridge.length!==3) || (s.jumped&&!s.arrived) || (s.planted&&!s.jumped)) throw Error('Invalid progress');
-  if(s.built.length>6||s.built.some(b=>!buildCells.some(c=>same(c,b))||!['coral','gold','mint'].includes(b.color)) || new Set(s.built.map(b=>`${b.x},${b.y}`)).size!==s.built.length || ['coral','gold','mint'].some(c=>s.built.filter(b=>b.color===c).length>2)) throw Error('Invalid building');
-  if(!walkable(s,s.player)) throw Error('Invalid position');
-  if(!s.started&&(s.picked.length||s.bridge.length||s.built.length||s.arrived||s.jumped||s.planted)) throw Error('Invalid start');
-  return {version:1,started:s.started,player:{x:s.player.x,y:s.player.y},picked:[...s.picked],bridge:[...s.bridge],built:s.built.map(b=>({x:b.x,y:b.y,color:b.color})),arrived:s.arrived,jumped:s.jumped,planted:s.planted,zh:s.zh};
-}
+import {restore as restoreLegacy} from './legacy-core.mjs';
+export const SAVE_KEY='blockling-english-v2', LEGACY_KEY='blockling-english-v1', PREFS_KEY='blockling-audio-v2';
+export const resources=[{id:'apple',x:2,y:3,type:'apple',word:'apple'},{id:'flower',x:1,y:5,type:'flower',word:'flower'},{id:'blue1',x:4,y:2,type:'blue',word:'blue block'},{id:'blue2',x:2,y:6,type:'blue',word:'blue block'},{id:'blue3',x:5,y:6,type:'blue',word:'blue block'}];
+export const materials=[{id:'wood1',x:10,y:6,type:'wood'},{id:'wood2',x:15,y:5,type:'wood'},{id:'seed1',x:12,y:7,type:'seed'},{id:'seed2',x:16,y:7,type:'seed'}];
+export const bridgeCells=[{x:7,y:4},{x:8,y:4},{x:9,y:4}];
+export const star={x:11,y:4},garden={x:11,y:5},bunny={x:11,y:3},home={x:14,y:3};
+export const buildCells=[{x:0,y:3},{x:0,y:4},{x:0,y:5},{x:1,y:6},{x:1,y:7},{x:2,y:7}];
+export const gardenPads=[{x:12,y:6},{x:13,y:7},{x:15,y:6},{x:16,y:5}];
+export const trees=[{x:1,y:1},{x:4,y:1},{x:6,y:2},{x:0,y:2},{x:12,y:3},{x:16,y:2}];
+export const choices={bench:{material:'wood',label:'Bench',phrase:'A little bench.'},lantern:{material:'wood',label:'Lantern',phrase:'A warm light.'},flowers:{material:'seed',label:'Flowers',phrase:'Pretty flowers.'},carrots:{material:'seed',label:'Carrots',phrase:'Carrots for bunny!'}};
+export const same=(a,b)=>a.x===b.x&&a.y===b.y;
+export const distance=(a,b)=>Math.abs(a.x-b.x)+Math.abs(a.y-b.y);
+export function isLand(x,y){return (x>=0&&x<=6&&y>=1&&y<=7&&!(x===0&&(y===1||y===7))&&!(x===6&&(y===1||y===7)))||(x>=10&&x<=16&&y>=2&&y<=8&&!(x===10&&y===2)&&!(x===16&&y===8));}
+const houseCells=[{x:14,y:3},{x:15,y:3},{x:14,y:4},{x:15,y:4}];
+export function freshState(){return {version:2,started:false,player:{x:3,y:4},picked:[],bridge:[],built:[],arrived:false,jumped:false,planted:false,zh:false,befriended:false,materials:[],decor:[],roof:'coral',finished:false};}
+export function quest(s){return !s.picked.includes('apple')?0:s.bridge.length<3?1:!s.befriended||!s.planted?2:!s.finished?3:4;}
+export const blueCount=s=>s.picked.filter(id=>id.startsWith('blue')).length-s.bridge.length;
+export const stock=(s,type)=>s.materials.filter(id=>id.startsWith(type)).length-s.decor.filter(d=>choices[d.kind].material===type).length;
+export function walkable(s,p){return (isLand(p.x,p.y)||bridgeCells.some((c,i)=>same(c,p)&&s.bridge.includes(i)))&&!trees.some(t=>same(t,p))&&!houseCells.some(t=>same(t,p))&&!s.built.some(b=>same(b,p))&&!s.decor.some(b=>same(b,p));}
+export function pathTo(s,target){if(!walkable(s,target))return null;const queue=[[s.player,[]]],seen=new Set([`${s.player.x},${s.player.y}`]);for(let i=0;i<queue.length;i++){const [p,path]=queue[i];if(same(p,target))return path;for(const [dx,dy] of [[1,0],[0,1],[-1,0],[0,-1]]){const n={x:p.x+dx,y:p.y+dy},key=`${n.x},${n.y}`;if(!seen.has(key)&&walkable(s,n)){seen.add(key);queue.push([n,[...path,n]]);}}}return null;}
+const ok=message=>({ok:true,message}),no=message=>({ok:false,message});
+const playable=s=>s.started&&!s.finished;
+export function move(s,p){if(!playable(s))return no('The island is resting.');if(distance(s.player,p)!==1||!walkable(s,p))return no('Try a clear grassy tile.');s.player={...p};if(s.bridge.length===3&&same(p,star))s.arrived=true;return ok('');}
+export function collect(s,id){if(!playable(s))return no('Start your adventure first.');const item=[...resources,...materials].find(r=>r.id===id);if(!item||!same(s.player,item))return no('Walk closer.');if(item.type==='flower')return ok('A flower! Hello, flower.');if(materials.includes(item)){if(!s.befriended)return no('Say hello to bunny first.');if(s.materials.includes(id))return no('Already in your bag.');s.materials.push(id);return ok(item.type==='wood'?'Wood! Make a bench or a lantern.':'Seeds! Grow flowers or carrots.');}if(s.picked.includes(id))return no('Already in your bag.');if(item.type==='blue'&&!s.picked.includes('apple'))return no('A blue block! Find the apple first.');s.picked.push(id);return ok(item.type==='apple'?'Apple! Someone across the river might like it.':`${['','One','Two','Three'][s.picked.filter(i=>i.startsWith('blue')).length]} blue block${blueCount(s)>1?'s':''}!`);}
+export function placeBridge(s,i){if(!playable(s)||quest(s)!==1)return no('Find the apple, then blue blocks.');if(i!==s.bridge.length||i>2)return no('Build the next bridge block.');if(blueCount(s)<1)return no('Find a blue block first.');if(distance(s.player,bridgeCells[i])!==1)return no('Walk beside the bridge.');s.bridge.push(i);return ok(s.bridge.length===3?'A bridge! Who is over there?':'Blue block placed!');}
+export function meetBunny(s){if(!playable(s)||s.bridge.length!==3)return no('Build a bridge to bunny.');if(distance(s.player,bunny)>1)return no('Walk closer to bunny.');if(s.befriended)return ok('Hello, friend! Bunny wiggles its ears.');s.befriended=true;return ok('Hello, bunny! An apple for you. Let’s make a home.');}
+export function jump(s){if(!playable(s))return no('The island is resting.');if(s.bridge.length===3&&same(s.player,star)){s.arrived=true;s.jumped=true;return ok('Jump! Plant a seed beside the star.');}return ok('Jump!');}
+export function plant(s){if(!playable(s)||!s.befriended||!s.jumped)return no('Say hello to bunny. Jump on the star!');if(s.planted)return no('Your flower is already growing.');if(!same(s.player,garden))return no('Walk to the little garden.');s.planted=true;return ok('Grow, little flower! Now make the garden your own.');}
+export function build(s,p,color){if(!playable(s))return no('The island is resting.');if(!['coral','gold','mint'].includes(color)||!buildCells.some(c=>same(c,p)))return no('Build on the six sandy tiles.');if(distance(s.player,p)!==1)return no('Stand beside the tile.');if(s.built.some(b=>same(b,p)))return no('A block is here. Pick it up to change it.');if(s.built.filter(b=>b.color===color).length>=2)return no('Both blocks are placed. Pick one up to move it.');s.built.push({...p,color});return ok(`${{coral:'Red',gold:'Yellow',mint:'Green'}[color]} block placed!`);}
+export function decorate(s,p,kind){if(!playable(s)||!s.befriended)return no('Say hello to bunny first.');if(!Object.hasOwn(choices,kind)||!gardenPads.some(c=>same(c,p)))return no('Choose one of the four garden plots.');if(distance(s.player,p)!==1)return no('Stand beside the garden plot.');if(s.decor.some(d=>same(d,p)))return no('Pick this up to choose something new.');if(stock(s,choices[kind].material)<1)return no(`Find ${choices[kind].material==='wood'?'a wood bundle':'a seed bag'} first.`);s.decor.push({...p,kind});return ok(choices[kind].phrase);}
+export function remove(s,p){if(!playable(s))return no('The island is resting.');if(distance(s.player,p)!==1)return no('Walk beside it.');for(const key of ['built','decor']){const i=s[key].findIndex(b=>same(b,p));if(i>=0){s[key].splice(i,1);return ok('Back in your bag. Try a new idea!');}}return no('Choose a block or garden decoration to pick up.');}
+export function setRoof(s,color){if(!playable(s)||!s.befriended||!['coral','gold','mint'].includes(color))return no('Meet bunny before choosing a roof.');s.roof=color;return ok(`${{coral:'Red',gold:'Yellow',mint:'Green'}[color]} roof. A home for friends!`);}
+export function finish(s){if(!playable(s)||!s.planted||!s.befriended||s.decor.length<2)return no('Grow a flower and decorate two garden plots first.');s.finished=true;return ok('A cosy garden. Time for a little picnic and a break.');}
+export function migrateLegacy(raw){const v=restoreLegacy(raw);return {...freshState(),...v,version:2,player:{...v.player},built:v.built.map(b=>({...b}))};}
+export function restore(raw){const s=JSON.parse(raw);if(!s||s.version!==2||!s.player||!Number.isInteger(s.player.x)||!Number.isInteger(s.player.y))throw Error('Invalid save');if(!['started','arrived','jumped','planted','zh','befriended','finished'].every(k=>typeof s[k]==='boolean'))throw Error('Invalid flags');for(const k of ['picked','bridge','built','materials','decor'])if(!Array.isArray(s[k]))throw Error('Invalid list');if(s.picked.some(i=>!['apple','blue1','blue2','blue3'].includes(i))||new Set(s.picked).size!==s.picked.length)throw Error('Invalid collection');if(s.bridge.length>3||s.bridge.some((v,i)=>v!==i)||blueCount(s)<0)throw Error('Invalid bridge');if(s.picked.some(i=>i.startsWith('blue'))&&!s.picked.includes('apple')||(s.arrived&&s.bridge.length!==3)||(s.jumped&&!s.arrived)||(s.planted&&!s.jumped)||(s.befriended&&s.bridge.length!==3))throw Error('Invalid progress');if(s.built.length>6||s.built.some(b=>!buildCells.some(c=>same(c,b))||!['coral','gold','mint'].includes(b.color))||new Set(s.built.map(b=>`${b.x},${b.y}`)).size!==s.built.length||['coral','gold','mint'].some(c=>s.built.filter(b=>b.color===c).length>2))throw Error('Invalid building');if(s.materials.some(id=>!materials.some(m=>m.id===id))||new Set(s.materials).size!==s.materials.length||(s.materials.length&&!s.befriended))throw Error('Invalid materials');if(s.decor.length>4||s.decor.some(d=>!d||!Object.hasOwn(choices,d.kind)||!gardenPads.some(p=>same(p,d)))||new Set(s.decor.map(d=>`${d.x},${d.y}`)).size!==s.decor.length||stock(s,'wood')<0||stock(s,'seed')<0||!['coral','gold','mint'].includes(s.roof))throw Error('Invalid garden');if(s.finished&&(!s.planted||!s.befriended||s.decor.length<2))throw Error('Invalid finish');if(!walkable(s,s.player))throw Error('Invalid position');if(!s.started&&(s.picked.length||s.bridge.length||s.built.length||s.materials.length||s.arrived||s.jumped||s.planted||s.befriended||s.finished))throw Error('Invalid start');return {version:2,...Object.fromEntries(['started','arrived','jumped','planted','zh','befriended','finished','roof'].map(k=>[k,s[k]])),player:{x:s.player.x,y:s.player.y},picked:[...s.picked],bridge:[...s.bridge],materials:[...s.materials],built:s.built.map(({x,y,color})=>({x,y,color})),decor:s.decor.map(({x,y,kind})=>({x,y,kind}))};}

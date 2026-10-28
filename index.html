@@ -2,38 +2,38 @@
 <html lang="en">
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#eaf1df"><meta name="description" content="A small, local block-building adventure for beginner English explorers.">
+  <meta name="theme-color" content="#eaf1df"><meta name="description" content="An original island adventure. Build a bridge, meet bunny and make a cosy garden.">
   <meta name="referrer" content="no-referrer">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'none'; font-src 'self'; object-src 'none'; base-uri 'none'">
-  <title>Blockling English · Sunny Shores</title><link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="stylesheet" href="style.css">
+  <title>Blockling English · Bunny Garden · V2</title><link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="stylesheet" href="style.css">
 </head>
 <body>
 <header class="topbar">
   <a class="brand" href="./" aria-label="Blockling English home"><img src="icon.svg" alt="" width="40" height="40"><span>blockling<span class="brand-small">ENGLISH</span></span></a>
-  <div class="island-name"><span class="sun">☀</span> SUNNY SHORES <span class="edition">A LITTLE ADVENTURE</span></div>
-  <div class="top-actions"><button id="zh" class="quiet" aria-pressed="false">中文提示</button><button id="parents" class="quiet">Parents <span aria-hidden="true">↗</span></button></div>
+  <div class="island-name"><span class="sun">☀</span> BUNNY GARDEN <span class="edition">BUNNY GARDEN · V2</span></div>
+  <div class="top-actions"><button id="music" class="quiet music-button" aria-pressed="true" aria-label="Turn music off"><span id="music-icon">♫</span><span id="music-label">Music on</span></button><button id="zh" class="quiet" aria-pressed="false">中文提示</button><button id="parents" class="quiet">Parents <span aria-hidden="true">↗</span></button></div>
 </header>
-<main class="game-shell">
+<p id="storage-warning" class="storage-warning" role="status" hidden></p><main class="game-shell">
   <aside class="journal" aria-label="Adventure journal">
     <div class="eyebrow">YOUR LITTLE JOURNEY <span>✦</span></div>
-    <div class="steps" aria-label="Three adventures"><span id="step0">1</span><i></i><span id="step1">2</span><i></i><span id="step2">3</span></div>
+    <div class="steps" aria-label="Four moments in our adventure"><span id="step0">1</span><i></i><span id="step1">2</span><i></i><span id="step2">3</span><i></i><span id="step3">4</span></div>
     <p class="chapter" id="chapter">01 / LITTLE WORDS</p>
     <h1 id="mission-title">A tasty hello.</h1>
     <p class="mission-intro" id="mission-intro">An apple for the journey.<br>Can you find one?</p>
     <div class="word-card"><span id="word-art" aria-hidden="true">🍎</span><strong id="word">apple</strong><button id="listen" aria-label="Listen to the English instruction" class="sound-button">♪ <span>Listen</span></button></div>
     <p class="instruction" id="instruction">Find the apple.</p>
     <p class="translation" id="translation" hidden></p>
-    <div class="checklist" id="checklist"></div>
+    <div class="checklist" id="checklist"></div><button id="finish" class="primary picnic-button" hidden>Picnic & rest ☀</button>
     <p class="voice-status" id="voice-status" role="status">Checking English voice…</p>
     <div class="buddy-note"><div class="tiny-buddy" aria-hidden="true">•ᴗ•</div><p id="buddy-note">Tap the grass to walk.<br>Tap an object to explore.</p></div>
     <button id="help" class="text-button">How to play <span>?</span></button>
   </aside>
   <section class="world-panel" aria-label="Sunny Shores game">
-    <div class="world-top"><span class="location"><span></span> SUNNY SHORES</span><span id="save-state" class="save-state">Saved on this device</span></div>
+    <div class="world-top"><div><span class="location" id="location">APPLE SHORE</span><span id="friend" class="friend-badge" hidden>♡ Bunny is with you</span></div><div class="world-options"><span id="save-state" class="save-state">Saved on this device</span><button id="map" class="quiet" aria-pressed="false">Map ⤢</button></div></div>
     <div id="world" class="world">
       <canvas id="scene" tabindex="0" aria-label="Island. Use arrow keys or W A S D to walk. Space to jump. E to interact. Or tap the island."></canvas>
       <div id="targets" aria-label="Island objects"></div>
-      <div class="world-caption">a little curiosity goes a long way.</div>
+      <div class="world-caption">a world you make a little more yours.</div>
       <div id="toast" class="toast" role="status" aria-live="polite"></div>
     </div>
     <div class="tool-area">
@@ -41,22 +41,23 @@
         <button data-tool="walk" class="tool active" aria-pressed="true"><span class="tool-art">↗</span><span>Explore</span><kbd>1</kbd></button>
         <button data-tool="bridge" class="tool" aria-pressed="false"><span class="cube blue"></span><span>Bridge <b id="blue-count">0</b></span><kbd>2</kbd></button>
         <button data-tool="build" class="tool" aria-pressed="false"><span class="cube coral"></span><span>Build</span><kbd>3</kbd></button>
+        <button id="garden-tool" data-tool="garden" class="tool" aria-pressed="false" hidden><span class="tool-art">✿</span><span>Garden</span></button>
         <button data-tool="remove" class="tool" aria-pressed="false"><span class="tool-art">↥</span><span>Pick up</span><kbd>4</kbd></button>
         <div class="tool-sep"></div><button id="jump" class="tool"><span class="tool-art">⌁</span><span>Jump</span><kbd>SPACE</kbd></button>
       </div>
       <div id="palette" class="palette" hidden><span>My blocks</span><button data-color="coral" aria-label="Red block" aria-pressed="true"><i class="swatch coral"></i> Red <b>2</b></button><button data-color="gold" aria-label="Yellow block" aria-pressed="false"><i class="swatch gold"></i> Yellow <b>2</b></button><button data-color="mint" aria-label="Green block" aria-pressed="false"><i class="swatch mint"></i> Green <b>2</b></button></div>
-      <p id="tool-hint" class="tool-hint">Tap to walk · Tap an object to collect · Arrow keys also work</p>
+      <div id="garden-palette" class="garden-palette" hidden><div class="material-bag">My bag <span>▰ wood <b id="wood-count">0</b></span><span>❧ seeds <b id="seed-count">0</b></span></div><div class="decor-options"><button data-decor="bench" aria-pressed="true"><span>▤</span>Bench<small>1 wood</small></button><button data-decor="lantern" aria-pressed="false"><span>☼</span>Lantern<small>1 wood</small></button><button data-decor="flowers" aria-pressed="false"><span>✿</span>Flowers<small>1 seed</small></button><button data-decor="carrots" aria-pressed="false"><span>🥕</span>Carrots<small>1 seed</small></button></div><div class="roof-colors"><span>Our roof</span><button data-roof="coral" aria-label="Red roof" aria-pressed="true"><i class="swatch coral"></i></button><button data-roof="gold" aria-label="Yellow roof" aria-pressed="false"><i class="swatch gold"></i></button><button data-roof="mint" aria-label="Green roof" aria-pressed="false"><i class="swatch mint"></i></button></div></div><p id="tool-hint" class="tool-hint">Tap to walk · Tap an object to collect · Arrow keys also work</p>
     </div>
     <div class="touch-controls" aria-label="Movement controls"><button data-dir="up" aria-label="Walk up">↖</button><button data-dir="right" aria-label="Walk right">↗</button><button data-dir="left" aria-label="Walk left">↙</button><button data-dir="down" aria-label="Walk down">↘</button></div>
   </section>
 </main>
 <footer><span>PLAY. BUILD. SAY HELLO.</span><span>No hurry. Just explore.</span><span class="local-note">SAVED ON DEVICE · NO ACCOUNT</span></footer>
 <dialog id="welcome" class="welcome-dialog" aria-labelledby="welcome-title">
-  <div class="modal-buddy" aria-hidden="true"><i></i><b>•ᴗ•</b></div><p class="eyebrow">WELCOME, LITTLE EXPLORER</p><h2 id="welcome-title">A little island.<br>A big hello.</h2><p>Find an apple. Build a bridge.<br>Make something bloom.</p><div class="welcome-chips"><span>🍎 Find</span><span>▰ Build</span><span>✿ Grow</span></div><button id="start" class="primary">Let’s explore <span>→</span></button><p class="small">3 small adventures · play at your pace<br>Grown-ups can help with the first hello.</p><button id="welcome-zh" class="text-button">中文玩法提示</button>
+  <div class="modal-buddy" aria-hidden="true"><i></i><b>•ᴗ•</b></div><p class="eyebrow">WELCOME, LITTLE EXPLORER</p><h2 id="welcome-title">A little world.<br>A new friend.</h2><p>Build a bridge. Meet bunny.<br>Make a cosy garden together.</p><div class="welcome-chips"><span>🍎 Find</span><span>▰ Build</span><span>🐰 Friends</span></div><button id="start" class="primary">Let’s explore <span>→</span></button><p class="small">One small journey · your own garden<br>Grown-ups can help with the first hello.</p><button id="welcome-zh" class="text-button">中文玩法提示</button>
 </dialog>
-<dialog id="help-dialog" aria-labelledby="help-title"><button class="close" data-close="help-dialog" aria-label="Close how to play">×</button><p class="eyebrow">A LITTLE HELP</p><h2 id="help-title">Make yourself at home.</h2><div class="help-grid"><p><b>↗ Walk</b>Tap grass or use arrow keys / W A S D. The little explorer finds a path.</p><p><b>✦ Collect</b>Tap an apple or blue block. Walk up to it and put it in your bag.</p><p><b>▰ Build</b>Use blue blocks on the dotted bridge. Use red, yellow or green blocks on sandy tiles.</p><p><b>⌁ Jump & grow</b>Press Space or Jump. Later, jump on the star and tap the garden to plant.</p></div><p class="translation always">点击草地移动；点击物品会走过去拾取。蓝色方块搭桥；红黄绿方块可在左侧沙地搭建，用 Pick up 收回。方向键 / WASD 移动，空格跳跃，E 与脚下或身边物品互动。没有倒计时，可以慢慢玩。</p><button class="primary" data-close="help-dialog">Got it! →</button></dialog>
-<dialog id="parents-dialog" aria-labelledby="parents-title"><button class="close" data-close="parents-dialog" aria-label="Close parents guide">×</button><p class="eyebrow">FOR GROWN-UPS / 家长说明</p><h2 id="parents-title">A gentle first adventure.</h2><p>为约 6 岁英语初学者设计的原创网页原型。建议家长首次陪玩；任务将词汇、颜色数量和简单动作放进探索过程，不承诺学习效果。</p><ol><li><b>Listen & find：</b>听 / 看 “Find the apple”，点击岛上的苹果。</li><li><b>Count & build：</b>收集 3 个 blue blocks，点击虚线处依次搭桥。</li><li><b>Move & grow：</b>走到星星，Jump，再点击花圃 Plant a seed。一轮后休息。</li></ol><p>点 Listen 使用浏览器提供的<strong>本机英语语音</strong>，无合适语音时显示文字模式。检测到语音不代表已验证实际发音；家长可先试听。不会请求麦克风。可随时打开中文提示。</p><p>只有游戏进度保存在当前浏览器 localStorage；游戏不收集儿童资料、无账号、无广告、无遥测。公开网页的托管平台可能保留访问和安全日志（包括 IP 地址）。不同浏览器存档独立，清理浏览器数据会清除进度。语音仅选择浏览器标记为本机的英语声音。</p><p id="parent-save" class="small"></p><div class="parent-actions"><button id="pause" class="primary">Take a break / 暂停</button><button id="reset" class="danger">Reset progress / 重置</button></div></dialog>
-<dialog id="reset-dialog" aria-labelledby="reset-title"><p class="eyebrow">GROWN-UP CHECK / 家长确认</p><h2 id="reset-title">Start a new adventure?</h2><p>这会清除本浏览器中的任务、桥和搭建进度，从头开始。其他浏览器不受影响。</p><div class="parent-actions"><button id="cancel-reset" class="primary">Keep my island / 取消</button><button id="confirm-reset" class="danger">Yes, start over / 确认重置</button></div></dialog>
+<dialog id="help-dialog" aria-labelledby="help-title"><button class="close" data-close="help-dialog" aria-label="Close how to play">×</button><p class="eyebrow">A LITTLE HELP</p><h2 id="help-title">Make yourself at home.</h2><div class="help-grid"><p><b>↗ Walk</b>Tap grass or use arrow keys / W A S D. The little explorer finds a path.</p><p><b>✦ Collect</b>Tap an apple or blue block. Walk up to it and put it in your bag.</p><p><b>▰ Build</b>Use blue blocks on the dotted bridge. Use red, yellow or green blocks on sandy tiles.</p><p><b>♡ Meet & make</b>Share the apple with bunny. Jump on the star, then plant a flower. Find wood and seeds. Choose Garden to decorate four plots with benches, lights, flowers or carrots.</p></div><p class="translation always">点击草地移动；点击物品会走过去拾取。蓝色方块搭桥；红黄绿方块可在左侧沙地搭建，用 Pick up 收回。方向键 / WASD 移动，空格跳跃，E 与脚下或身边物品互动。搭桥后点击小兔，跳过星星任务，再种花。收集木材和种子，点 Garden 选家具或植物，再点花园空地。Pick up 可收回材料重摆。Map 可看全岛并点击草地前往。布置两处后可点 Picnic & rest 结束，没有倒计时。</p><button class="primary" data-close="help-dialog">Got it! →</button></dialog>
+<dialog id="parents-dialog" aria-labelledby="parents-title"><button class="close" data-close="parents-dialog" aria-label="Close parents guide">×</button><p class="eyebrow">FOR GROWN-UPS / 家长说明</p><h2 id="parents-title">A gentle first adventure.</h2><p>为约 6 岁英语初学者设计的原创网页原型。建议家长首次陪玩；任务将词汇、颜色数量和简单动作放进探索过程，不承诺学习效果。</p><ol><li><b>Listen & find：</b>听 / 看 “Find the apple”，点击岛上的苹果。</li><li><b>Count & build：</b>收集 3 个 blue blocks，点击虚线处依次搭桥。</li><li><b>Meet & grow：</b>给小兔苹果，走到星星 Jump，再点击花圃种花。</li><li><b>Make it yours：</b>收集 2 捆木材与 2 袋种子，自选长椅、灯、鲜花、胡萝卜布置四处空地，也可选屋顶颜色；布置至少两处后点 Picnic & rest 休息。</li></ol><p>点 Listen 使用浏览器提供的<strong>本机英语语音</strong>，无合适语音时显示文字模式。检测到语音不代表已验证实际发音；家长可先试听。不会请求麦克风。可随时打开中文提示。</p><p>只有游戏进度保存在当前浏览器 localStorage；游戏不收集儿童资料、无账号、无广告、无遥测。公开网页的托管平台可能保留访问和安全日志（包括 IP 地址）。不同浏览器存档独立，清理浏览器数据会清除进度。语音仅选择浏览器标记为本机的英语声音。</p><p>轻音乐为原创程序化旋律，首次点击开始后低音量播放。顶部音乐按钮可关闭并保存偏好；朗读期间自动压低，暂停、打开说明或离开页面时停止。无音频时仍可玩。画面使用 Canvas 2.5D 等距绘制与跟随视角，不是真正 3D 引擎。</p><p id="audio-status" class="audio-status" role="status">Music waits for a tap.</p><p id="parent-save" class="small"></p><div class="parent-actions"><button id="pause" class="primary">Take a break / 暂停</button><button id="reset" class="danger">Reset progress / 重置</button></div></dialog>
+<dialog id="reset-dialog" aria-labelledby="reset-title"><p class="eyebrow">GROWN-UP CHECK / 家长确认</p><h2 id="reset-title">Start a new adventure?</h2><p>这会重置本浏览器的 V2 任务、桥、伙伴与花园。旧版 V1 存档和音乐偏好保留；其他浏览器不受影响。</p><div class="parent-actions"><button id="cancel-reset" class="primary">Keep my island / 取消</button><button id="confirm-reset" class="danger">Yes, start over / 确认重置</button></div></dialog>
 <dialog id="rest-dialog" aria-labelledby="rest-title"><div class="rest-flower" aria-hidden="true">✿</div><p class="eyebrow" id="rest-eyebrow">OUR ADVENTURE IS COMPLETE</p><h2 id="rest-title">A little flower.<br>A lovely place to stop.</h2><p id="rest-copy">You found an apple, built a bridge<br>and planted a flower. Thank you, explorer!</p><div id="word-recap" class="word-recap"><button data-say="apple">🍎 apple ♪</button><button data-say="Three blue blocks.">▰ three blue blocks ♪</button><button data-say="Walk. Jump. Plant.">✿ walk · jump · plant ♪</button></div><p class="translation always" id="rest-zh">这一轮完成啦。看看远处，伸伸懒腰，喝口水。下次再来。</p><button id="rest-close" class="primary">Rest here / 在这里休息 ☀</button><p class="small">Your island is saved. You can close this tab.</p></dialog>
 <noscript>This island needs JavaScript. 请在浏览器中开启 JavaScript 后刷新。</noscript>
 <script type="module" src="app.mjs"></script>
